@@ -62,7 +62,7 @@ def generate(text, file_name, api_key, model="gemini-2.0-flash-exp"):
                 save_binary_file(temp_path, inline_data.data)
                 print(
                     "File of mime type "
-                    f"{inline_data.mime_type} saved to: {temp_path}"
+                    f"{inline_data.mime_type} saved to: {temp_path} and prompt input :{text}"
                 )
             else:
                 print(chunk.text)
