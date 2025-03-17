@@ -89,7 +89,7 @@ def process_image_and_prompt(composite_pil, prompt, gemini_api_key):
             result_img = result_img.convert("RGB")
         return [result_img]
     except Exception as e:
-        raise gr.Error(f"NFSW Detected", duration=5)
+        raise gr.Error(f"Error Getting {e}", duration=5)
 
 # Build a Blocks-based interface to include the custom HTML header.
 with gr.Blocks() as demo:
