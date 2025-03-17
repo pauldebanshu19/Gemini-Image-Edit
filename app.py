@@ -117,7 +117,7 @@ with gr.Blocks() as demo:
 
     gr.Markdown("""
 ## ⚠️ API Configuration ⚠️
-- **Issue:** ❗ Sometimes the model returns text instead of an image, causing failures when saving as an image.  
+- **Issue:** ❗ Sometimes the model returns text instead of an image.  
 ### 🔧 Steps to Address:
 1. **🛠️ Duplicate the Repository**  
    - Create a separate copy for modifications.  
