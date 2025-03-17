@@ -104,6 +104,7 @@ with gr.Blocks() as demo:
         <h1>Gen AI Image Editing</h1>
         <p>Gemini using for Image Editing</p>
         <p>Powered by <a href="https://gradio.app/">Gradio</a> ⚡️</p>
+        <p> Duplicate Repo < href="https://huggingface.co/spaces/ameerazam08/Gemini-Image-Edit?duplicate=true">Duplicate</a></p>
         <p>Get an API Key <a href="https://aistudio.google.com/apikey">here</a></p>
         <p>Follow me on Twitter: <a href="https://x.com/Ameerazam18">Ameerazam18</a></p>
     </div>
