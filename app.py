@@ -127,6 +127,7 @@ with gr.Blocks() as demo:
 ### 📌 Usage  
 - Upload an image and enter a prompt to generate outputs.
 - If text is returned instead of an image, it will appear in the text output.
+- Upload Only PNG Image
 - ❌ **Do not use NSFW images!**
 """)
 
