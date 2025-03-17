@@ -69,24 +69,27 @@ def generate(text, file_name, api_key, model="gemini-2.0-flash-exp"):
 
     del files
     return temp_path
- 
+
 
 def process_image_and_prompt(composite_pil, prompt, gemini_api_key):
-    # Save the composite image to a temporary file.
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        composite_path = tmp.name
-        composite_pil.save(composite_path)
+    try:
+        # Save the composite image to a temporary file.
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            composite_path = tmp.name
+            composite_pil.save(composite_path)
 
-    file_name = composite_path  
-    input_text = prompt 
-    model = "gemini-2.0-flash-exp" 
+        file_name = composite_path  
+        input_text = prompt 
+        model = "gemini-2.0-flash-exp" 
 
-    gemma_edited_image_path = generate(text=input_text, file_name=file_name, api_key=gemini_api_key, model=model)
-    print("image_path ", gemma_edited_image_path)
-    result_img = Image.open(gemma_edited_image_path)
-    if result_img.mode == "RGBA":
-        result_img = result_img.convert("RGB")
-    return [result_img]
+        gemma_edited_image_path = generate(text=input_text, file_name=file_name, api_key=gemini_api_key, model=model)
+        print("image_path ", gemma_edited_image_path)
+        result_img = Image.open(gemma_edited_image_path)
+        if result_img.mode == "RGBA":
+            result_img = result_img.convert("RGB")
+        return [result_img]
+    except Exception as e:
+        raise gr.Error(f"Error Getting {e}", duration=5)
 
 # Build a Blocks-based interface to include the custom HTML header.
 with gr.Blocks() as demo:
@@ -163,4 +166,4 @@ with gr.Blocks() as demo:
         label="Try these examples"
     )
 
-demo.launch(share=True)
+demo.queue(max_size=500).launch()
