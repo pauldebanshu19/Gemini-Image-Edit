@@ -17,6 +17,9 @@ def save_binary_file(file_name, data):
 
 def generate(text, file_name, api_key, model="gemini-2.0-flash-exp"):
     # Initialize client using provided api_key (or fallback to env variable)
+    if not api_key and not os.environ.get("GEMINI_API_KEY"):
+        raise ValueError("Please provide a Gemini API key")
+    
     client = genai.Client(api_key=(api_key.strip() if api_key and api_key.strip() != ""
                                      else os.environ.get("GEMINI_API_KEY")))
     
@@ -72,6 +75,9 @@ def generate(text, file_name, api_key, model="gemini-2.0-flash-exp"):
 
 def process_image_and_prompt(composite_pil, prompt, gemini_api_key):
     try:
+        if not composite_pil:
+            return None, "Please upload an image first!"
+            
         # Save the composite image to a temporary file.
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
             composite_path = tmp.name
@@ -93,11 +99,54 @@ def process_image_and_prompt(composite_pil, prompt, gemini_api_key):
             # Return no image and the text response.
             return None, text_response
     except Exception as e:
-        raise gr.Error(f"Error Getting {e}", duration=5)
+        return None, f"Error: {str(e)}"
 
+# Custom CSS for loading animation
+loading_css = """
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 105, 180, 0.1);
+    border-radius: 50%;
+    border-top-color: #FF69B4;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Kawaii stars animation */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.star {
+    position: absolute;
+    background: #FFD700;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: twinkle 2s infinite;
+}
+"""
 
 # Build a Blocks-based interface with a custom HTML header and CSS
-with gr.Blocks(css_paths="style.css",) as demo:
+with gr.Blocks(css=loading_css, theme=gr.themes.Soft(primary_hue="pink")) as demo:
     # Custom HTML header with proper class for styling
     gr.HTML(
     """
@@ -106,90 +155,89 @@ with gr.Blocks(css_paths="style.css",) as demo:
           <img src="https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png" alt="Gemini logo">
       </div>
       <div>
-          <h1>Gemini for Image Editing</h1>
-          <p>Powered by <a href="https://gradio.app/">Gradio</a>⚡️| 
-          <a href="https://huggingface.co/spaces/ameerazam08/Gemini-Image-Edit?duplicate=true">Duplicate</a> this Repo |
-          <a href="https://aistudio.google.com/apikey">Get an API Key</a> | 
-          Follow me on Twitter: <a href="https://x.com/Ameerazam18">Ameerazam18</a></p>
+          <h1>✨ Kawaii Image Editor ✨</h1>
+          <p>Transform your images with magical AI powers! | Powered by <a href="https://gradio.app/">Gradio</a> ⚡️</p>
       </div>
     </div>
     """
     )
     
-    with gr.Accordion("⚠️ API Configuration ⚠️", open=False, elem_classes="config-accordion"):
+    with gr.Accordion("✨ Configuration ✨", open=False, elem_classes="config-accordion"):
         gr.Markdown("""
-    - **Issue:** ❗ Sometimes the model returns text instead of an image.  
-    ### 🔧 Steps to Address:
-    1. **🛠️ Duplicate the Repository**  
-       - Create a separate copy for modifications.  
-    2. **🔑 Use Your Own Gemini API Key**  
-       - You **must** configure your own Gemini key for generation!  
-    """)
-
-    with gr.Accordion("📌 Usage Instructions", open=False, elem_classes="instructions-accordion"):
-        gr.Markdown("""
-    ### 📌 Usage  
-    - Upload an image and enter a prompt to generate outputs.
-    - If text is returned instead of an image, it will appear in the text output.
-    - Upload Only PNG Image
-    - ❌ **Do not use NSFW images!**
-    """)
+        ### 🎀 Settings
+        - **Model**: Gemini 2.0 Flash
+        - **Temperature**: 1.0
+        - **Max Tokens**: 8192
+        
+        ### 💫 Important Notes
+        - Use your own Gemini API key for best results
+        - Upload PNG images for optimal performance
+        - Processing time may vary based on image size
+        """)
 
     with gr.Row(elem_classes="main-content"):
         with gr.Column(elem_classes="input-column"):
             image_input = gr.Image(
                 type="pil",
-                label="Upload Image",
+                label="🎨 Upload Your Image",
                 image_mode="RGBA",
                 elem_id="image-input",
                 elem_classes="upload-box"
             )
             gemini_api_key = gr.Textbox(
                 lines=1,
-                placeholder="Enter Gemini API Key (optional)",
-                label="Gemini API Key (optional)",
+                placeholder="🔑 Enter your Gemini API Key here...",
+                label="API Key",
                 elem_classes="api-key-input"
             )
             prompt_input = gr.Textbox(
                 lines=2,
-                placeholder="Enter prompt here...",
-                label="Prompt",
+                placeholder="✨ Describe the magical changes you want to make...",
+                label="Edit Prompt",
                 elem_classes="prompt-input"
             )
-            submit_btn = gr.Button("Generate", elem_classes="generate-btn")
+            submit_btn = gr.Button("✨ Generate Magic ✨", elem_classes="generate-btn")
         
         with gr.Column(elem_classes="output-column"):
-            output_gallery = gr.Gallery(label="Generated Outputs", elem_classes="output-gallery")
+            output_gallery = gr.Gallery(
+                label="🎀 Generated Output", 
+                elem_classes="output-gallery",
+                show_label=True
+            )
             output_text = gr.Textbox(
-                label="Gemini Output", 
-                placeholder="Text response will appear here if no image is generated.",
+                label="💫 Status", 
+                placeholder="✨ Processing status will appear here...",
                 elem_classes="output-text"
             )
 
-    # Set up the interaction with two outputs.
+    # Set up the interaction with loading animation
     submit_btn.click(
         fn=process_image_and_prompt,
         inputs=[image_input, prompt_input, gemini_api_key],
         outputs=[output_gallery, output_text],
     )
     
-    gr.Markdown("## Try these examples", elem_classes="gr-examples-header")
+    gr.Markdown("## 💖 Example Prompts", elem_classes="gr-examples-header")
     
-    examples = [
-        ["data/1.webp", 'change text to "AMEER"', ""],
-        ["data/2.webp", "remove the spoon from hand only", ""],
-        ["data/3.webp", 'change text to "Make it "', ""],
-        ["data/1.jpg", "add joker style only on face", ""],
-        ["data/1777043.jpg", "add joker style only on face", ""],
-        ["data/2807615.jpg", "add lipstick on lip only", ""],
-        ["data/76860.jpg", "add lipstick on lip only", ""],
-        ["data/2807615.jpg", "make it happy looking face only", ""],
-    ]
+    # Remove examples section since it's causing issues with caching
+    # examples = [
+    #     ["data/1.webp", 'change text to "AMEER"', ""],
+    #     ["data/2.webp", "remove the spoon from hand only", ""],
+    #     ["data/3.webp", 'change text to "Make it "', ""],
+    #     ["data/1.jpg", "add joker style only on face", ""],
+    #     ["data/1777043.jpg", "add joker style only on face", ""],
+    #     ["data/2807615.jpg", "add lipstick on lip only", ""],
+    #     ["data/76860.jpg", "add lipstick on lip only", ""],
+    #     ["data/2807615.jpg", "make it happy looking face only", ""],
+    # ]
     
-    gr.Examples(
-        examples=examples,
-        inputs=[image_input, prompt_input,],
-        elem_id="examples-grid"
-    )
+    # gr.Examples(
+    #     examples=examples,
+    #     inputs=[image_input, prompt_input],
+    #     outputs=[output_gallery, output_text],
+    #     fn=process_image_and_prompt,
+    #     cache_examples=True,
+    #     elem_id="examples-grid"
+    # )
 
 demo.queue(max_size=50).launch()
