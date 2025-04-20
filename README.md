@@ -31,7 +31,7 @@ A magical image editing application powered by Google's Gemini AI and Gradio. Tr
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/gemini-image-edit.git
+git clone https://github.com/pauldebanshu19/Gemini-Image-Edit.git
 cd gemini-image-edit
 ```
 
