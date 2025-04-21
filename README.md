@@ -1,14 +1,3 @@
----
-title: Gemini Image Edit
-emoji: 📚
-colorFrom: indigo
-colorTo: blue
-sdk: gradio
-sdk_version: 5.20.1
-app_file: app.py
-pinned: true
----
-
 # Gemini Image Edit
 
 A magical image editing application powered by Google's Gemini AI and Gradio. Transform your images with AI-powered edits using natural language prompts.
