@@ -150,16 +150,13 @@ with gr.Blocks(css=loading_css, theme=gr.themes.Soft(primary_hue="pink")) as dem
     # Custom HTML header with proper class for styling
     gr.HTML(
     """
-    <div class="header-container" style="display: flex; align-items: center; padding: 0 0 15px 10px; margin-top: -5px;">
-      <div style="margin-right: 15px;">
-          <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/613b1914c1f260001e077ffd/0x0.png" alt="VYBE logo" style="max-width: 90px; display: block; margin: 0;">
-      </div>
-      <div>
-          <h1>Gemini for Image Editing</h1>
-          <p>Powered by <a href="https://gradio.app/">Gradio</a>⚡️| 
-          <a href="https://huggingface.co/spaces/ameerazam08/Gemini-Image-Edit?duplicate=true">Duplicate</a> this Repo |
-          <a href="https://aistudio.google.com/apikey">Get an API Key</a> | 
-          Follow me on Twitter: <a href="https://x.com/Ameerazam18">Ameerazam18</a></p>
+    <div class="header-container">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+          <img src="https://s3-eu-west-1.amazonaws.com/tpd/logos/613b1914c1f260001e077ffd/0x0.png" alt="VYBE logo" style="max-width: 80px;">
+          <div>
+              <h1>Instant Fashion</h1>
+              <p>Transform your images with magical AI powers!</p>
+          </div>
       </div>
     </div>
     """
@@ -167,28 +164,22 @@ with gr.Blocks(css=loading_css, theme=gr.themes.Soft(primary_hue="pink")) as dem
     
     with gr.Accordion("⚠️ API Configuration ⚠️", open=False, elem_classes="config-accordion"):
         gr.Markdown("""
-    - **Issue:** ❗ Sometimes the model returns text instead of an image.  
-    ### 🔧 Steps to Address:
-    1. **🛠️ Duplicate the Repository**  
-       - Create a separate copy for modifications.  
-    2. **🔑 Use Your Own Gemini API Key**  
-       - You **must** configure your own Gemini key for generation!  
-    """)
-
-    with gr.Accordion("📌 Usage Instructions", open=False, elem_classes="instructions-accordion"):
-        gr.Markdown("""
-    ### 📌 Usage  
-    - Upload an image and enter a prompt to generate outputs.
-    - If text is returned instead of an image, it will appear in the text output.
-    - Upload Only PNG Image
-    - ❌ **Do not use NSFW images!**
-    """)
+        ###  Settings
+        - **Model**: Gemini 2.0 Flash
+        - **Temperature**: 1.0
+        - **Max Tokens**: 8192
+        
+        ###  Important Notes
+        - Use your own Gemini API key for best results
+        - Upload PNG images for optimal performance
+        - Processing time may vary based on image size
+        """)
 
     with gr.Row(elem_classes="main-content"):
         with gr.Column(elem_classes="input-column"):
             image_input = gr.Image(
                 type="pil",
-                label="Upload Image",
+                label=" Upload Your Image",
                 image_mode="RGBA",
                 elem_id="image-input",
                 elem_classes="upload-box"
@@ -205,44 +196,25 @@ with gr.Blocks(css=loading_css, theme=gr.themes.Soft(primary_hue="pink")) as dem
                 label="Edit Prompt",
                 elem_classes="prompt-input"
             )
-            submit_btn = gr.Button("Generate", elem_classes="generate-btn")
+            submit_btn = gr.Button(" Generate Image ", elem_classes="generate-btn")
         
         with gr.Column(elem_classes="output-column"):
-            output_gallery = gr.Gallery(label="Generated Outputs", elem_classes="output-gallery")
+            output_gallery = gr.Gallery(
+                label=" Generated Output", 
+                elem_classes="output-gallery",
+                show_label=True
+            )
             output_text = gr.Textbox(
-                label="Gemini Output", 
-                placeholder="Text response will appear here if no image is generated.",
+                label=" Status", 
+                placeholder="✨ Processing status will appear here...",
                 elem_classes="output-text"
             )
 
-    # Set up the interaction with loading animation
+    # Set up the interaction
     submit_btn.click(
         fn=process_image_and_prompt,
         inputs=[image_input, prompt_input, gemini_api_key],
         outputs=[output_gallery, output_text],
     )
-    
-    gr.Markdown("## Try these examples", elem_classes="gr-examples-header")
-    
-    # Remove examples section since it's causing issues with caching
-    # examples = [
-    #     ["data/1.webp", 'change text to "AMEER"', ""],
-    #     ["data/2.webp", "remove the spoon from hand only", ""],
-    #     ["data/3.webp", 'change text to "Make it "', ""],
-    #     ["data/1.jpg", "add joker style only on face", ""],
-    #     ["data/1777043.jpg", "add joker style only on face", ""],
-    #     ["data/2807615.jpg", "add lipstick on lip only", ""],
-    #     ["data/76860.jpg", "add lipstick on lip only", ""],
-    #     ["data/2807615.jpg", "make it happy looking face only", ""],
-    # ]
-    
-    # gr.Examples(
-    #     examples=examples,
-    #     inputs=[image_input, prompt_input],
-    #     outputs=[output_gallery, output_text],
-    #     fn=process_image_and_prompt,
-    #     cache_examples=True,
-    #     elem_id="examples-grid"
-    # )
 
 demo.queue(max_size=50).launch()
